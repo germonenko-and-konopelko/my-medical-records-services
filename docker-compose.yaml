@@ -1,0 +1,17 @@
+name: 'mmr'
+
+services:
+  postgres:
+    container_name: 'postgres'
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${MMR_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${MMR_POSTGRES_PASSWORD}
+      - POSTGRES_DB=Identity
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
