@@ -1,7 +1,16 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using MMR.Api.FluentValidation;
+using MMR.Common.Api;
+using MMR.Common.Api.Versioning;
+using MMR.Common.Data;
+using MMR.Patient;
+
+ValidatorOptions.Global.LanguageManager = new MmrLanguageManager();
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -11,6 +20,19 @@ builder.Services.Configure<JsonSerializerOptions>(jsonOptions =>
 {
     jsonOptions.IncludeFields = true;
     jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+});
+
+builder.Services.AddDbContext<MmrDatabaseContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Postgres");
+    options.UseNpgsql(
+        connectionString,
+        postgresBuilder => {
+            postgresBuilder.MigrationsAssembly("MMR.Common.Data");
+            postgresBuilder.MigrationsHistoryTable("migrations_history", "system");
+        });
+    options.UseSnakeCaseNamingConvention();
+    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
 builder.Services.AddOpenApi();
@@ -51,5 +73,25 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use((context, next) =>
+{
+    var currentUserClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "user_id");
+    if (currentUserClaim is null)
+    {
+        return next(context);
+    }
+
+    var userContext = context.RequestServices.GetService<UserContext>();
+    if (userContext is not null)
+    {
+        userContext.CurrentUserId = currentUserClaim.Value;
+    }
+
+    return next(context);
+});
+
+var v1Preview = app.MapGroup($"api/{Versions.V1Preview}");
+v1Preview.MapPatientEndpoints();
 
 app.Run();
