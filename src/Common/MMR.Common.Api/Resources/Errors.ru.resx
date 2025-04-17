@@ -17,4 +17,10 @@
     <data name="ProblemResponseDetail" xml:space="preserve">
         <value>Дополнительные сведения смотрите в свойстве invalidFields.</value>
     </data>
+    <data name="ServerErrorTitle" xml:space="preserve">
+        <value>Произошла непредвиденная ошибка.</value>
+    </data>
+    <data name="ServerErrorDetail" xml:space="preserve">
+        <value>Если ошибка повторяется – пожалуйста, обратитесь в поддержку.</value>
+    </data>
 </root>

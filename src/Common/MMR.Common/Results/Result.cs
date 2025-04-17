@@ -1,20 +1,28 @@
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MMR.Common.Results;
 
 public static class Result
 {
-    public static Result<TError> Ok<TError>() => Result<TError>.FromResult();
+    public static Result<TError> Ok<TError>()
+        where TError : notnull
+        => Result<TError>.FromResult();
 
-    public static Result<TError> Err<TError>(TError error) => Result<TError>.FromError(error);
+    public static Result<TError> Err<TError>(TError error)
+        where TError :notnull
+        => Result<TError>.FromError(error);
 
-    public static Result<TResult, TError> Ok<TResult, TError>(TResult result)
-        => Result<TResult, TError>.FromResult(result);
+    public static Result<TValue, TError> Ok<TValue, TError>(TValue result)
+        where TValue : notnull
+        where TError : notnull
+        => Result<TValue, TError>.FromValue(result);
 
-    public static Result<TResult, TError> Err<TResult, TError>(TError error)
-        => Result<TResult, TError>.FromError(error);
+    public static Result<TValue, TError> Err<TValue, TError>(TError error)
+        where TValue : notnull
+        where TError : notnull
+        => Result<TValue, TError>.FromError(error);
 
-    public static async Task<Result<Exception>> SafelyAsync(Func<Task> func)
+    public static async Task<Result<Exception>> TryAsync(Func<Task> func)
     {
         try
         {
@@ -26,69 +34,105 @@ public static class Result
             return Err(e);
         }
     }
-}
 
-public class Result<TError>
-{
-    private readonly TError? _error;
-
-    private Result(TError? error)
+    public static Result<TValue, Exception> Try<TValue>(Func<TValue> func) where TValue : notnull
     {
-        _error = error;
+        try
+        {
+            var result = func();
+            return Ok<TValue, Exception>(result);
+        }
+        catch (Exception e)
+        {
+            return Err<TValue, Exception>(e);
+        }
     }
 
-    public bool IsError => _error is null;
+    public static async Task<Result<TValue, Exception>> TryAsync<TValue>(Func<Task<TValue>> func) where TValue : notnull
+    {
+        try
+        {
+            var result = await func();
+            return Ok<TValue, Exception>(result);
+        }
+        catch (Exception e)
+        {
+            return Err<TValue, Exception>(e);
+        }
+    }
+}
+
+public class Result<TError> where TError :notnull
+{
+    public readonly TError? Error;
+
+    private Result(TError? error, bool isOk)
+    {
+        IsOk = isOk;
+        Error = error;
+    }
+
+    [MemberNotNullWhen(false, nameof(Error))]
+    public bool IsOk { get; }
+
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool IsError => !IsOk;
 
     public static Result<TError> FromResult()
     {
-        return new(default);
+        return new(default, isOk: true);
     }
 
     public static Result<TError> FromError(TError error)
     {
-        return new(error);
+        return new(error, isOk: false);
     }
 }
 
-public class Result<TResult, TError>
+public sealed class Result<TValue, TError>
+    where TValue : notnull
+    where TError : notnull
 {
-    private readonly TResult? _result;
-    private readonly TError? _error;
+    public readonly TValue? Value;
+    public readonly TError? Error;
 
-    private Result(TResult? result, TError? error)
+    private Result(TValue? value, TError? error, bool isOk)
     {
-        if (result is null && error is null)
+        if (value is null && error is null)
         {
             throw new ArgumentException("Both the result and the error cannot be null.");
         }
 
-        if (result is not null && error is not null)
+        IsOk = isOk;
+        Value = value;
+        Error = error;
+    }
+
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
+    public bool IsOk { get; }
+
+    [MemberNotNullWhen(true, nameof(Error))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool IsError => !IsOk;
+
+    public Result<TValue, TError2> MapError<TError2>(Func<TError, TError2> mapFunc) where TError2 : notnull
+    {
+        if (IsOk)
         {
-            throw new ArgumentException("The result or the error must be null.");
+            return Result.Ok<TValue, TError2>(Value);
         }
 
-        _result = result;
-        _error = error;
+        return Result.Err<TValue, TError2>(mapFunc(Error));
     }
 
-    public bool IsOk => _result is null;
-
-    public bool IsError => _error is null;
-
-    public TResult Unwrap() => _result ?? throw new UnwrapException($"Failed to unwrap a result of type {GetType()}.");
-
-    public TResult UnwrapOr(TResult defaultValue)
+    public static Result<TValue, TError> FromValue(TValue result)
     {
-        return _result ?? defaultValue;
+        return new(result, default, isOk: true);
     }
 
-    public static Result<TResult, TError> FromResult(TResult result)
+    public static Result<TValue, TError> FromError(TError error)
     {
-        return new(result, default);
-    }
-
-    public static Result<TResult, TError> FromError(TError error)
-    {
-        return new(default, error);
+        return new(default, error, isOk: false);
     }
 }

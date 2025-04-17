@@ -1,4 +1,6 @@
+using System.Text.Json;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using MMR.Common.Api.Resources;
 using MMR.Common.Api.Responses;
 
@@ -8,13 +10,14 @@ public static class ValidationResultExtensions
 {
     public static ProblemResponse ToProblemResponse(this ValidationResult validationResult)
     {
-        var problemResponse = new ProblemResponse
-        {
-            Title = Errors.ProblemResponseTitle,
-            Detail = Errors.ProblemResponseDetail,
-            Status = 400,
-        };
+        var error = ProblemResponse.ValidationError;
+        error.InvalidFields = validationResult.Errors
+            .GroupBy(err => err.PropertyName)
+            .ToDictionary(
+                err => JsonNamingPolicy.CamelCase.ConvertName(err.Key),
+                err => err.Select(e => new FieldError { Code = e.ErrorCode, Message = e.ErrorMessage })
+            );
 
-        return problemResponse;
+        return error;
     }
 }

@@ -5,6 +5,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using MMR.Api.FluentValidation;
+using MMR.Api.Middleware;
 using MMR.Common.Api;
 using MMR.Common.Api.Versioning;
 using MMR.Common.Data;
@@ -35,7 +36,6 @@ builder.Services.AddDbContext<MmrDatabaseContext>(options =>
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
-builder.Services.AddOpenApi();
 builder.Services.AddLocalization();
 builder.Services.AddRequestLocalization(localization =>
 {
@@ -57,14 +57,15 @@ builder.Services
 
 builder.Services
     .AddAuthorizationBuilder()
-    .AddDefaultPolicy(
-        "User",
-        policy => policy.RequireClaim("user_id ").RequireClaim("email")
-    );
+    .AddDefaultPolicy("DefinedUser", policy => policy.RequireClaim("user_id"));
+
+builder.Services.AddScoped<UserContext>();
+builder.Services.AddPatientModule();
+
+builder.Services.AddSingleton<SetUserContextMiddleware>();
+builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
-
-app.MapOpenApi();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -74,24 +75,13 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Use((context, next) =>
-{
-    var currentUserClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "user_id");
-    if (currentUserClaim is null)
-    {
-        return next(context);
-    }
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<SetUserContextMiddleware>();
 
-    var userContext = context.RequestServices.GetService<UserContext>();
-    if (userContext is not null)
-    {
-        userContext.CurrentUserId = currentUserClaim.Value;
-    }
+var v1Preview = app
+    .MapGroup($"api/{Versions.V1Preview}")
+    .RequireAuthorization();
 
-    return next(context);
-});
-
-var v1Preview = app.MapGroup($"api/{Versions.V1Preview}");
 v1Preview.MapPatientEndpoints();
 
 app.Run();

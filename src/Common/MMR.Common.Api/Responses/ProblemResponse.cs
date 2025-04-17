@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
+using MMR.Common.Api.Resources;
 
 namespace MMR.Common.Api.Responses;
 
@@ -29,6 +31,20 @@ public class ProblemResponse
     [JsonPropertyName("invalidFields")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Dictionary<string, IEnumerable<FieldError>>? InvalidFields { get; set; }
+
+    public static ProblemResponse ValidationError => new()
+    {
+        Title = Errors.ProblemResponseTitle,
+        Detail = Errors.ProblemResponseDetail,
+        Status = StatusCodes.Status400BadRequest,
+    };
+
+    public static ProblemResponse ServerError => new()
+    {
+        Title = Errors.ServerErrorTitle,
+        Detail = Errors.ServerErrorDetail,
+        Status = StatusCodes.Status500InternalServerError,
+    };
 }
 
 public class FieldError

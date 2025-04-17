@@ -1,6 +1,6 @@
 using MMR.Common.Enums;
 
-namespace MMR.Patient.Create;
+namespace MMR.Patient.Common;
 
 public class Profile
 {

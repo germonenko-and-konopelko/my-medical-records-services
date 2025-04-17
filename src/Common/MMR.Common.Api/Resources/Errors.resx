@@ -24,4 +24,10 @@
     <data name="ProblemResponseDetail" xml:space="preserve">
         <value>See the invalidFields property for details.</value>
     </data>
+    <data name="ServerErrorTitle" xml:space="preserve">
+        <value>An unknown server error occurred.</value>
+    </data>
+    <data name="ServerErrorDetail" xml:space="preserve">
+        <value>If the error persists, please contact support.</value>
+    </data>
 </root>

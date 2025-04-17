@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="CannotCreatePatientProfileTitle" xml:space="preserve">
+        <value>Could not create a profile for the patient.</value>
+    </data>
+    <data name="CannotUpdatePatientProfileTitle" xml:space="preserve">
+        <value>Could not update the profile.</value>
+    </data>
+    <data name="PatientProfileExistsErrorDetails" xml:space="preserve">
+        <value>The profile already exists.</value>
+    </data>
+    <data name="PatientProfileDoesNotExistErrorDetails" xml:space="preserve">
+        <value>Patient profile does not exist.</value>
+    </data>
+    <data name="MustBePastDate" xml:space="preserve">
+        <value>The value must be a date in the past.</value>
+    </data>
+    <data name="MinBirthdayMessage" xml:space="preserve">
+        <value>Birthdays earlier than 1930-01-01 are unsupported.</value>
+    </data>
+    <data name="MustBeMaleOrFemale" xml:space="preserve">
+        <value>The value must be either "male" or "female".</value>
+    </data>
+</root>

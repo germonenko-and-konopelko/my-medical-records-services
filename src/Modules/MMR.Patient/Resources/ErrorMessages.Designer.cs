@@ -7,28 +7,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MMR.Common.Api.Resources {
+namespace MMR.Patient.Resources {
     using System;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Errors {
+    internal class ErrorMessages {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Errors() {
+        internal ErrorMessages() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("MMR.Common.Api.Resources.Errors", typeof(Errors).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("MMR.Patient.Resources.ErrorMessages", typeof(ErrorMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -45,27 +45,45 @@ namespace MMR.Common.Api.Resources {
             }
         }
         
-        internal static string ProblemResponseTitle {
+        internal static string CannotCreatePatientProfileTitle {
             get {
-                return ResourceManager.GetString("ProblemResponseTitle", resourceCulture);
+                return ResourceManager.GetString("CannotCreatePatientProfileTitle", resourceCulture);
             }
         }
         
-        internal static string ProblemResponseDetail {
+        internal static string CannotUpdatePatientProfileTitle {
             get {
-                return ResourceManager.GetString("ProblemResponseDetail", resourceCulture);
+                return ResourceManager.GetString("CannotUpdatePatientProfileTitle", resourceCulture);
             }
         }
         
-        internal static string ServerErrorTitle {
+        internal static string PatientProfileExistsErrorDetails {
             get {
-                return ResourceManager.GetString("ServerErrorTitle", resourceCulture);
+                return ResourceManager.GetString("PatientProfileExistsErrorDetails", resourceCulture);
             }
         }
         
-        internal static string ServerErrorDetail {
+        internal static string PatientProfileDoesNotExistErrorDetails {
             get {
-                return ResourceManager.GetString("ServerErrorDetail", resourceCulture);
+                return ResourceManager.GetString("PatientProfileDoesNotExistErrorDetails", resourceCulture);
+            }
+        }
+        
+        internal static string MustBePastDate {
+            get {
+                return ResourceManager.GetString("MustBePastDate", resourceCulture);
+            }
+        }
+        
+        internal static string MinBirthdayMessage {
+            get {
+                return ResourceManager.GetString("MinBirthdayMessage", resourceCulture);
+            }
+        }
+        
+        internal static string MustBeMaleOrFemale {
+            get {
+                return ResourceManager.GetString("MustBeMaleOrFemale", resourceCulture);
             }
         }
     }
