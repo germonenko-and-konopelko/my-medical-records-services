@@ -1,7 +1,5 @@
 using System.Text.Json;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Http;
-using MMR.Common.Api.Resources;
 using MMR.Common.Api.Responses;
 
 namespace MMR.Common.Api.Validation;
@@ -10,7 +8,7 @@ public static class ValidationResultExtensions
 {
     public static ProblemResponse ToProblemResponse(this ValidationResult validationResult)
     {
-        var error = ProblemResponse.ValidationError;
+        ProblemResponse error = ProblemResponse.ValidationError;
         error.InvalidFields = validationResult.Errors
             .GroupBy(err => err.PropertyName)
             .ToDictionary(

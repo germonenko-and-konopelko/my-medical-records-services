@@ -39,7 +39,7 @@ public static class Result
     {
         try
         {
-            var result = func();
+            TValue result = func();
             return Ok<TValue, Exception>(result);
         }
         catch (Exception e)
@@ -52,7 +52,7 @@ public static class Result
     {
         try
         {
-            var result = await func();
+            TValue result = await func();
             return Ok<TValue, Exception>(result);
         }
         catch (Exception e)
@@ -124,6 +124,20 @@ public sealed class Result<TValue, TError>
         }
 
         return Result.Err<TValue, TError2>(mapFunc(Error));
+    }
+
+    public Result<TValue, TError> Inspect(Action<TValue> inspectValueFunc, Action<TError> inspectErrorFunc)
+    {
+        if (IsOk)
+        {
+            inspectValueFunc(Value);
+        }
+        else
+        {
+            inspectErrorFunc(Error);
+        }
+
+        return this;
     }
 
     public static Result<TValue, TError> FromValue(TValue result)

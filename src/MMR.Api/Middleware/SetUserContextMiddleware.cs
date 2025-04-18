@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MMR.Common.Api;
 
 namespace MMR.Api.Middleware;
@@ -6,7 +7,7 @@ public class SetUserContextMiddleware : IMiddleware
 {
     public Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var currentUserClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "user_id");
+        Claim? currentUserClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "user_id");
         if (currentUserClaim is null)
         {
             return next(context);

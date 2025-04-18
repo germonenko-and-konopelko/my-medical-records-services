@@ -3,7 +3,14 @@ using Sqids;
 
 namespace MMR.Common.Encoding;
 
-public class Encoder(SqidsEncoder<long> innerEncoder)
+public interface IEncoder
+{
+    public Result<string, EncoderError> Encode(long source);
+
+    public Result<long, EncoderError> Decode(string source);
+}
+
+public class Encoder(SqidsEncoder<long> innerEncoder) : IEncoder
 {
     public Result<string, EncoderError> Encode(long source)
     {
@@ -28,10 +35,10 @@ public class Encoder(SqidsEncoder<long> innerEncoder)
             );
         }
 
-        var decodeResult = Result.Try(() => innerEncoder.Decode(source));
+        Result<IReadOnlyList<long>, Exception> decodeResult = Result.Try(() => innerEncoder.Decode(source));
         if (decodeResult.IsError)
         {
-            var error = new EncoderError(EncoderErrorCode.InnerError, decodeResult.Error);
+            EncoderError error = new(EncoderErrorCode.InnerError, decodeResult.Error);
             return Result.Err<long, EncoderError>(error);
         }
 

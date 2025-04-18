@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MMR.Common.Data.Entities;
 
 namespace MMR.Common.Data;
@@ -38,16 +39,16 @@ public class MmrDatabaseContext(DbContextOptions<MmrDatabaseContext> options, Ti
 
     private void SetCreatedAndUpdateDate()
     {
-        var affectedEntities = ChangeTracker
+        IEnumerable<EntityEntry<MmrEntity>>? affectedEntities = ChangeTracker
             .Entries<MmrEntity>()
             .Where(e => e.State is EntityState.Added or EntityState.Modified);
 
-        foreach (var entity in affectedEntities)
+        foreach (EntityEntry<MmrEntity>? entity in affectedEntities)
         {
             switch (entity.State)
             {
                 case EntityState.Added:
-                    var now = timeProvider.GetUtcNow();
+                    DateTimeOffset now = timeProvider.GetUtcNow();
                     entity.Entity.CreatedAt = now;
                     entity.Entity.UpdatedAt = now;
                     break;

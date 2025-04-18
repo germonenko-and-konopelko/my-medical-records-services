@@ -5,20 +5,35 @@ namespace MMR.Common.Api;
 
 public struct PossiblyUndefined<T>
 {
-    public readonly bool Defined;
+    public readonly bool Defined = false;
 
-    public readonly T? Value;
-
-    public PossiblyUndefined()
-    {
-        Defined = false;
-        Value = default;
-    }
+    public readonly T? Value = default;
 
     public PossiblyUndefined(T? value)
     {
         Defined = true;
         Value = value;
+    }
+}
+
+public class PossiblyUndefinedJsonConverterFactory : JsonConverterFactory
+{
+    public override bool CanConvert(Type typeToConvert)
+    {
+        if (!typeToConvert.IsGenericType)
+        {
+            return false;
+        }
+
+        return typeToConvert.GetGenericTypeDefinition() == typeof(PossiblyUndefined<>);
+    }
+
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    {
+        Type valueType = typeToConvert.GetGenericArguments()[0];
+        Type converterType = typeof(PossiblyUndefinedJsonConverter<>).MakeGenericType(valueType);
+
+        return (JsonConverter)Activator.CreateInstance(converterType)!;
     }
 }
 

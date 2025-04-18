@@ -9,7 +9,9 @@ using MMR.Api.Middleware;
 using MMR.Common.Api;
 using MMR.Common.Api.Versioning;
 using MMR.Common.Data;
+using MMR.Common.Encoding;
 using MMR.Patient;
+using Sqids;
 
 ValidatorOptions.Global.LanguageManager = new MmrLanguageManager();
 
@@ -17,10 +19,20 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.WebHost.UseKestrel(kestrel => kestrel.AddServerHeader = false);
 
-builder.Services.Configure<JsonSerializerOptions>(jsonOptions =>
+var sqidsEncoder = new SqidsEncoder<long>(new SqidsOptions
 {
-    jsonOptions.IncludeFields = true;
-    jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+    Alphabet = builder.Configuration.GetRequiredValue<string>("Sqids:Alphabet"),
+});
+var encoder = new Encoder(sqidsEncoder);
+builder.Services.AddSingleton<IEncoder>(encoder);
+
+builder.Services.ConfigureHttpJsonOptions(jsonOptions =>
+{
+    var serializerOptions = jsonOptions.SerializerOptions;
+    serializerOptions.IncludeFields = true;
+    serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+    serializerOptions.Converters.Add(new PossiblyUndefinedJsonConverterFactory());
+    serializerOptions.Converters.Add(new EncodedLongJsonConverter(encoder));
 });
 
 builder.Services.AddDbContext<MmrDatabaseContext>(options =>

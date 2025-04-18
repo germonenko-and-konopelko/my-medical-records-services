@@ -1,9 +1,12 @@
+using System.Text.Json.Serialization;
+using MMR.Common.Encoding;
 using MMR.Common.Enums;
 
 namespace MMR.Patient.Common;
 
 public class Profile
 {
+    [JsonConverter(typeof(EncodedLongJsonConverter))]
     public long Id { get; set; }
 
     public string UserId { get; set; } = string.Empty;

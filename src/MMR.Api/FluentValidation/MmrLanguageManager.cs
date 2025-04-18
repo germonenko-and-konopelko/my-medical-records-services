@@ -20,7 +20,7 @@ public class MmrLanguageManager : LanguageManager
 
     private void AddLocalizedTranslations(string errorCode, string resourceKey)
     {
-        foreach (var culture in Cultures)
+        foreach (CultureInfo? culture in Cultures)
         {
             var message = Resources.FluentValidation.ResourceManager.GetString(resourceKey, culture);
             AddTranslation(culture.Name, errorCode, message);
