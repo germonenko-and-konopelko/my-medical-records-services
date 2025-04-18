@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_USER=${MMR_POSTGRES_USER}
       - POSTGRES_PASSWORD=${MMR_POSTGRES_PASSWORD}
-      - POSTGRES_DB=Identity
+      - POSTGRES_DB=mmr
     ports:
       - '5432:5432'
     volumes:
